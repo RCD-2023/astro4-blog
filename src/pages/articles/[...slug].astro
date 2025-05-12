@@ -1,9 +1,20 @@
-<!-- o sa facem un site static mai intai -->
+
 ---
 import MainLayout from '../../layouts/MainLayout.astro';
 import Tags from '../../components/Tags.astro';
 import { getEntry } from "astro:content";
 import { formatDate } from '../../utils';
+
+export async function getStaticPaths() {
+  const { getCollection } = await import("astro:content");
+  const posts = await getCollection("blog");
+
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+  }));
+}
+
+export const prerender = true;
 const { slug } = Astro.params;
 if (slug === undefined) {
   throw new Error("Slug is required");
@@ -37,17 +48,3 @@ const { Content } = await entry.render();
     }
   </style>
 
-<!-- codul final ramas activ este pentru ssr (ServerSiteRendering) -->
-
-<!--  codul de mai jos este varianta pentru static webpage generation (SSG)
-export async function getStaticPaths() {
-  const allBlogArticles: CollectionEntry<'blog'>[] = await getCollection('blog'); 
-
-  return allBlogArticles.map(entry => ({
-    params: {
-      slug: entry.slug,
-    },
-    props: {entry}
-  }));
-}
-const {entry} = Astro.props; -->
